@@ -1,10 +1,10 @@
+const path = require("path");
 const babel = require("rollup-plugin-babel");
 const replace = require("rollup-plugin-replace");
 const commonjs = require("rollup-plugin-commonjs");
 const nodeResolve = require("rollup-plugin-node-resolve");
-const { sizeSnapshot } = require("rollup-plugin-size-snapshot");
 const { uglify } = require("rollup-plugin-uglify");
-const path = require("path");
+
 const pkg = require("./package.json");
 
 function isBareModuleId(id) {
@@ -24,7 +24,7 @@ const cjs = [
     },
     external: isBareModuleId,
     plugins: [
-      babel({ exclude: /node_modules/, sourceMaps: true }),
+      babel({ exclude: /node_modules/, sourceMaps: true, rootMode: "upward" }),
       replace({
         "process.env.NODE_ENV": JSON.stringify("development"),
         "process.env.BUILD_FORMAT": JSON.stringify("cjs")
@@ -36,7 +36,7 @@ const cjs = [
     output: { file: `cjs/${pkg.name}.min.js`, sourcemap: true, format: "cjs" },
     external: isBareModuleId,
     plugins: [
-      babel({ exclude: /node_modules/, sourceMaps: true }),
+      babel({ exclude: /node_modules/, sourceMaps: true, rootMode: "upward" }),
       replace({
         "process.env.NODE_ENV": JSON.stringify("production"),
         "process.env.BUILD_FORMAT": JSON.stringify("cjs")
@@ -56,10 +56,12 @@ const esm = [
         exclude: /node_modules/,
         runtimeHelpers: true,
         sourceMaps: true,
-        plugins: [["@babel/transform-runtime", { useESModules: true }]]
+        plugins: [["@babel/transform-runtime", { useESModules: true }]],
+        rootMode: "upward"
       }),
-      replace({ "process.env.BUILD_FORMAT": JSON.stringify("esm") }),
-      sizeSnapshot()
+      replace({
+        "process.env.BUILD_FORMAT": JSON.stringify("esm")
+      })
     ]
   }
 ];
@@ -84,20 +86,20 @@ const umd = [
         exclude: /node_modules/,
         runtimeHelpers: true,
         sourceMaps: true,
-        plugins: [["@babel/transform-runtime", { useESModules: true }]]
+        plugins: [["@babel/transform-runtime", { useESModules: true }]],
+        rootMode: "upward"
       }),
       nodeResolve(),
       commonjs({
         include: /node_modules/,
         namedExports: {
-          "node_modules/react-is/index.js": ["isValidElementType"]
+          "../../node_modules/react-is/index.js": ["isValidElementType"]
         }
       }),
       replace({
         "process.env.NODE_ENV": JSON.stringify("development"),
         "process.env.BUILD_FORMAT": JSON.stringify("umd")
-      }),
-      sizeSnapshot()
+      })
     ]
   },
   {
@@ -117,20 +119,20 @@ const umd = [
         exclude: /node_modules/,
         runtimeHelpers: true,
         sourceMaps: true,
-        plugins: [["@babel/transform-runtime", { useESModules: true }]]
+        plugins: [["@babel/transform-runtime", { useESModules: true }]],
+        rootMode: "upward"
       }),
       nodeResolve(),
       commonjs({
         include: /node_modules/,
         namedExports: {
-          "node_modules/react-is/index.js": ["isValidElementType"]
+          "../../node_modules/react-is/index.js": ["isValidElementType"]
         }
       }),
       replace({
         "process.env.NODE_ENV": JSON.stringify("production"),
         "process.env.BUILD_FORMAT": JSON.stringify("umd")
       }),
-      sizeSnapshot(),
       uglify()
     ]
   }

@@ -1,6 +1,14 @@
-# node.js
 node_modules/
 npm-debug.log
-
-# lerna
 lerna-debug.log
+
+/.tsc-output/
+/build/
+/.changelog/
+/packages/*/cjs/
+/packages/*/esm/
+/packages/*/umd/
+/website/build/
+
+/website-deploy-key
+/website-deploy-key.pub
